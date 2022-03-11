@@ -7,5 +7,4 @@ i am going to try to make a simple clicker game with some basic stuff such as:
   a shop - done
   automatic clickers - done
   multipliers - done
-  prestiges
   and maybe more
