@@ -1,4 +1,17 @@
 body {
   font-family: sans-serif;
+
   background-color: rgb(49, 49, 49);
+}
+
+#store {
+  display: flex;
+  width: 320px;
+  flex-flow: row wrap;
+  background-color: black;
+}
+
+.store-modifier {
+  height: 80px;
+  width: 160px;
 }

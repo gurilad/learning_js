@@ -1,31 +1,87 @@
 import "./styles.css";
 
-var clickamt = 0;
-document.getElementById("clicker").onclick = function clicked() {
-  document.getElementById("counter").innerHTML = "you have ";
-  clickamt += 1 * multiplier;
-  document.getElementById("counter").innerHTML += clickamt + " points";
+const store = document.getElementById("store");
+const counter = document.getElementById("counter");
+const clicker = document.getElementById("clicker");
+
+const state = {
+  totalPoints: 0,
+  points: 0,
+  fortuneCost: 20,
+  pointsPerClick: 1,
+  autoClickPoints: 0,
+  modifiers: [
+    {
+      name: "fortune",
+      cost: 150,
+      canBeClicked: (state, modifier, index) => state.points >= modifier.cost,
+      onClick: (state, settings, index) => {
+        state.points -= settings.cost;
+        state.pointsPerClick++;
+        settings.cost *= 2;
+        return state;
+      }
+    },
+    {
+      name: "autoclick",
+      cost: 100,
+      canBeClicked: (state, modifier, index) => state.points >= modifier.cost,
+      onClick: (state, modifier, index) => {
+        state.points -= modifier.cost;
+        modifier.cost *= 2;
+        state.autoClickPoints++;
+        return state;
+      }
+    }
+  ]
 };
 
-var shopOpen = false;
-document.getElementById("shop").onclick = function shoptoggle() {
-  shopOpen = !shopOpen;
-  if (shopOpen) {
-    console.log("test1");
-  } else {
-    console.log("test");
-  }
+const addPoints = (points) => {
+  state.points += points;
+  state.totalPoints += points;
 };
 
-var multiplier = 1;
-document.getElementById("fortune").onclick = function fortne() {
-  var cost = multiplier * 20;
-  if (clickamt >= cost) {
-    document.getElementById("counter").innerHTML = "you have ";
-    multiplier *= 2;
-    clickamt -= cost;
-    document.getElementById("counter").innerHTML += clickamt + " points";
-  } else {
-    console.log("not enough points");
-  }
+const updateCounter = () => {
+  counter.innerHTML = `You have ${state.points} points!`;
 };
+
+const onClickClicker = () => {
+  addPoints(state.pointsPerClick);
+  updateCounter();
+  updateStore();
+};
+
+const updateStore = () => {
+  store.innerHTML = "";
+
+  state.modifiers.forEach((modifier, index) => {
+    const modifierElem = document.createElement("button");
+
+    const canBeClicked = modifier.canBeClicked(state, modifier, index);
+
+    modifierElem.style.backgroundColor = canBeClicked ? "pink" : "grey";
+    modifierElem.classList.add("store-modifier");
+    modifierElem.innerText = `${modifier.name} - cost: ${modifier.cost}`;
+
+    const onClickModifier = () => {
+      modifier.onClick(state, modifier, index);
+      updateStore();
+      updateCounter();
+    };
+
+    if (canBeClicked) modifierElem.addEventListener("click", onClickModifier);
+
+    store.appendChild(modifierElem);
+  });
+};
+
+clicker.addEventListener("click", onClickClicker);
+
+updateCounter();
+updateStore();
+
+setInterval(() => {
+  addPoints(state.autoClickPoints);
+  updateCounter();
+  updateStore();
+}, 1000);
