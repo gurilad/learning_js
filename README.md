@@ -7,4 +7,7 @@ i am going to try to make a simple clicker game with some basic stuff such as:
   a shop - done
   automatic clickers - done
   multipliers - done
+  combos
+  total times clicked
+  More css for design
   and maybe more
