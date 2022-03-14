@@ -3,6 +3,7 @@ import "./styles.css";
 const store = document.getElementById("store");
 const counter = document.getElementById("counter");
 const clicker = document.getElementById("clicker");
+const timerCombo = document.querySelector("#time");
 
 const state = {
   totalPoints: 0,
@@ -10,7 +11,7 @@ const state = {
   fortuneCost: 20,
   pointsPerClick: 1,
   autoClickPoints: 0,
-  comboCountDwn: 10,
+  comboCountDwn: 60 * 1,
   modifiers: [
     {
       name: "fortune",
@@ -36,21 +37,27 @@ const state = {
     },
     {
       name: "combo",
-      cost: 10,
+      cost: 1,
 
       canBeClicked: (state, modifier, index) => state.points >= modifier.cost,
       onClick: (state, modifier, index) => {
         state.points -= modifier.cost;
         modifier.cost *= 15;
-        let countTime = state.comboCountTime;
+        let countTime = state.comboCountDwn,
+          minutes,
+          seconds;
         window.addEventListener("keydown", (event) => {
-          if (event.key === "e" && countTime <= 0) {
-            let cooldown = setInterval(() => {
-              if (countTime <= 0) {
-                clearInterval(cooldown);
-              }
-              countTime -= 1;
-            });
+          if (event.key === "e") {
+            minutes = parseInt(countTime / 60, 10);
+            seconds = parseInt(countTime % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            timerCombo.textContent = minutes + ":" + seconds;
+
+            state.pointsPerClick += 1;
+            if (--countTime < 0) countTime = state.comboCountDwn;
           }
         });
         return state;
